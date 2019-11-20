@@ -27,12 +27,6 @@ def de_subpix(y, DF):
 		for j in range(DF):
 			d.append(y[:, :, i::DF, j::DF])
 
-	# for i in range(0, h1):
-	# 	for j in range(0, w1):
-	# 		for k in range(0, DF):
-	# 			for l in range(0, DF):
-	# 				d_idx = k*DF + l
-	# 				d[d_idx][:,:,i,j] = y[:,:,i*DF+k,j*DF+l]
 	out = torch.cat(d, dim=1)
 
 	return out
