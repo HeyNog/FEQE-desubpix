@@ -8,27 +8,15 @@ import torch.nn as nn
 
 
 def de_subpix(y, DF):
-	'''
-	Desubpixel Shuffle in FEQE.
-	Args:
-		y: The input tensor in the desubpixel shuffle, shape (b, c, h, w)
-		DF: The downsampling factor of the desubpixel shuffle.
-
-	Output:
-		out: The output tensor of desubpixel shuffle, shape (b, DF^2*c, h//DF, w//DF)
-	'''
 	(b, c, h, w) = y.shape
 	assert (h%DF == 0 and w%DF == 0), 'Input Shape (%d,%d) mismatch with Downsampling-Factor %d'%(h,w,DF)
-
-	h1 = int(h / DF)
-	w1 = int(w / DF)
+	
 	d = []
 	for i in range(DF):
 		for j in range(DF):
 			d.append(y[:, :, i::DF, j::DF])
 
 	out = torch.cat(d, dim=1)
-
 	return out
 
 
