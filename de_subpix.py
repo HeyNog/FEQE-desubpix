@@ -5,24 +5,22 @@
 import torch
 
 
-def de_subpix(y):
-    (b, c, h, w) = y.shape
-    # print(b, c, h, w)
-    h1 = int(h / 2)
-    w1 = int(w / 2)
-    d1 = torch.zeros((b, c, h1, w1))
-    d2 = torch.zeros((b, c, h1, w1))
-    d3 = torch.zeros((b, c, h1, w1))
-    d4 = torch.zeros((b, c, h1, w1))
-    # print(y.shape)
-    for i in range(0, h1, 2):
-        for j in range(0, w1, 2):
-            d1[:, :, i, j] = y[:, :, 2 * i, 2 * j]
-            d2[:, :, i, j] = y[:, :, 2 * i + 1, 2 * j]
-            d3[:, :, i, j] = y[:, :, 2 * i, 2 * j + 1]
-            d4[:, :, i, j] = y[:, :, 2 * i + 1, 2 * j + 1]
-            # print()
-            # print(i,j)
-    out = torch.cat([d1, d2, d3, d4], 1)
-    # print(out.shape)
-    return out
+def de_subpix(y, DF):
+	(b, c, h, w) = y.shape
+	assert (h%DF == 0 and w%DF == 0), 'Input Shape (%d,%d) mismatch with Downsampling-Factor %d'%(h,w,DF)
+
+	h1 = int(h / DF)
+	w1 = int(w / DF)
+	d = []
+	for i in range(DF**2):
+		d.append(torch.zeros((b, c, h1, w1)))
+
+	for i in range(0, h1):
+		for j in range(0, w1):
+			for k in range(0, DF):
+				for l in range(0, DF):
+					d_idx = k*DF + l
+					d[d_idx][:,:,i,j] = y[:,:,i*DF+k,j*DF+l]
+	out = torch.cat(d, dim=1)
+
+	return out
